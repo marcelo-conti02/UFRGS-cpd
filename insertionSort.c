@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX1 100
-#define MAX2 1000 // tamanho dos arrays
-#define MAX3 10000
+#define MAX 100
 
 typedef struct log_info
 {                    // estrutura que armazena quantidades de operações (comparações e trocas)
@@ -20,73 +18,68 @@ int busca_binaria(int *, int, int, int, log_info *);
 
 int main(void)
 {
-    int *array = (int *)malloc((sizeof(int) * MAX1) * 3);
-    int *arrayrandom = (int *)malloc(sizeof(int) * MAX1);
-    int *arraycrescente = (int *)malloc(sizeof(int) * MAX1);
-    int *arraydecrescente = (int *)malloc(sizeof(int) * MAX1); // array dinâmico que armazena os números
-    log_info logRandom, logCresc, logDecresc;                                              // armazena contadores de comparações e trocas, além do tempo
+    log_info logRandom, logCresc, logDecresc;     // armazena contadores de comparações e trocas, além do tempo
     clock_t t;
     
     srand(time(NULL));
 
-    // Gera os 3 tipos de array
-    for (int i = 0; i < MAX1; i++)
-        arrayrandom[i] = rand() % MAX1; // gera números aleatórios para o array
-    for (int i = 0; i < MAX1; i++)
-        arraycrescente[i] = i; // gera números em ordem crescente
-    for (int i = 0; i < MAX1; i++)
-        arraydecrescente[i] = MAX1 - i; // gera números em ordem decrescente
+    for(int j = 1; j <= MAX; j = j * 10)
+    {
+        //aloca as arrays
+        int *arrayrandom = (int *)malloc(sizeof(int) * (MAX*j));
+        int *arraycrescente = (int *)malloc(sizeof(int) * (MAX*j));
+        int *arraydecrescente = (int *)malloc(sizeof(int) * (MAX*j));
+
+        // Gera os 3 tipos de array
+        for (int i = 0; i < MAX * j; i++)
+            arrayrandom[i] = rand() % (MAX * j); // gera números aleatórios para o array
+        for (int i = 0; i < MAX * j; i++)
+            arraycrescente[i] = i; // gera números em ordem crescente
+        for (int i = 0; i < MAX * j; i++)
+            arraydecrescente[i] = (MAX * j) - i; // gera números em ordem decrescente  
     
-    //ordena array aleatorio
-    t = clock();
-    insertion_sort(arrayrandom, MAX1, &logRandom);
-    t = clock() - t;
-    logRandom.tempo = ((double)t) / CLOCKS_PER_SEC;
+        //ordena array aleatorio
+        t = clock();
+        insertion_sort(arrayrandom, MAX * j, &logRandom);
+        t = clock() - t;
+        logRandom.tempo = ((double)t) / CLOCKS_PER_SEC;
 
-    //ordena array em ordem cresc
-    t = clock();
-    insertion_sort(arraycrescente, MAX1, &logCresc);
-    t = clock() - t;
-    logCresc.tempo = ((double)t) / CLOCKS_PER_SEC; 
+        //ordena array em ordem cresc
+        t = clock();
+        insertion_sort(arraycrescente, MAX * j, &logCresc);
+        t = clock() - t;
+        logCresc.tempo = ((double)t) / CLOCKS_PER_SEC; 
 
-    //ordena array em ordem decresecente
-    t = clock();
-    insertion_sort(arraydecrescente, MAX1, &logDecresc);
-    t = clock() - t;
-    logDecresc.tempo = ((double)t) / CLOCKS_PER_SEC; 
+        //ordena array em ordem decresecente
+        t = clock();
+        insertion_sort(arraydecrescente, MAX * j, &logDecresc);
+        t = clock() - t;
+        logDecresc.tempo = ((double)t) / CLOCKS_PER_SEC; 
 
-    //tabela com os resultados
-    printf("\n------------------------------------------------------------------");
-    printf("\n100 Elementos:");
-    printf("\n");
-    printf("\nARRAY");
-    printf("\t\tTROCAS");
-    printf("\t\tCOMPARAÇÕES");
-    printf("\tTEMPO");
-    printf("\n");
-    printf("\nAleatorio");
-    printf("\t%d", logRandom.trocas);
-    printf("\t\t%d", logRandom.comparacoes);
-    printf("\t\t%fs", logRandom.tempo);
-    printf("\n");
-    printf("\nCrescente");
-    printf("\t%d", logCresc.trocas);
-    printf("\t\t%d", logCresc.comparacoes);
-    printf("\t\t%fs", logCresc.tempo);
-    printf("\n");
-    printf("\nDecrescente");
-    printf("\t%d", logDecresc.trocas);
-    printf("\t\t%d", logDecresc.comparacoes);
-    printf("\t\t%fs", logDecresc.tempo);
-    printf("\n");
-    printf("\n------------------------------------------------------------------");
+        //tabela com os resultados
+        printf("\n------------------------------------------------------------------");
+        printf("\n%d Elementos:\n\nARRAY\t\t\tTROCAS\t\tCOMPARAÇÕES\tTEMPO\n", MAX * j);
+        printf("\nAleatorio");
+        printf("\t\t%d", logRandom.trocas);
+        printf("\t\t%d", logRandom.comparacoes);
+        printf("\t\t%fs", logRandom.tempo);
+        printf("\n");
+        printf("\nCrescente");
+        printf("\t\t%d", logCresc.trocas);
+        printf("\t\t%d", logCresc.comparacoes);
+        printf("\t\t%fs", logCresc.tempo);
+        printf("\n");
+        printf("\nDecrescente");
+        printf("\t\t%d", logDecresc.trocas);
+        printf("\t\t%d", logDecresc.comparacoes);
+        printf("\t\t%fs", logDecresc.tempo);
+        printf("\n");
 
-
-    // TODO: mostrar informações de execução de todos os algoritmos nos diferentes tipos de array
-
-    free(arrayrandom);
-    free(arraycrescente);
-    free(arraydecrescente);
+        //libera a memoria alocada
+        free(arrayrandom);
+        free(arraycrescente);
+        free(arraydecrescente);
+    }
 
     return 0;
 }
