@@ -23,6 +23,7 @@ int main(void)
     
     srand(time(NULL));
 
+    //faz o processo em array de 100, 1000 e 10000 elementos
     for(int j = 1; j <= MAX; j = j * 10)
     {
         //aloca as arrays
@@ -58,7 +59,7 @@ int main(void)
 
         //tabela com os resultados
         printf("\n------------------------------------------------------------------");
-        printf("\n%d Elementos:\n\nARRAY\t\t\tTROCAS\t\tCOMPARAÇÕES\tTEMPO\n", MAX * j);
+        printf("\n%d Elementos:\n\nARRAY\t\t\tTROCAS\t\tCOMPARACOES\tTEMPO\n", MAX * j);
         printf("\nAleatorio");
         printf("\t\t%d", logRandom.trocas);
         printf("\t\t%d", logRandom.comparacoes);
@@ -112,6 +113,42 @@ void insertion_sort(int *array, int array_size, log_info *log)
 // *****************************************************
 //  TODO: Implementação dos seus algoritmos (a seguir)
 // *****************************************************
+//funçao pra realizar a bucsa binaria e retornar a posição que deve ser inserida na array(se retornar -1 deve ser inserida na posição 0)
+int buscaBinaria(int primeiro, int ultimo, int *array, int chave, int comp)
+{
+    //acha o meio da array
+    int meio = (primeiro + ultimo) / 2; 
+
+    //se nao tiver nenhum elemento igual a chave na array
+    if (primeiro == ultimo && chave != array[meio])
+    {
+        comp++;
+        if(chave > array[meio])
+            return meio + 1;
+        else
+            return meio - 1;
+    }
+
+    //se tiver um elemento igual a chave na array
+    if(array[meio] == chave)
+    {
+        comp++;
+        return meio + 1;
+    }
+
+    //se o elemento do meio for maior que a chave
+    if(array[meio] > chave)
+    {
+        comp++;
+        return buscaBinaria(primeiro, meio - 1, array, chave);
+    }
+    //se o elemento do meio for menor que a chave
+    else
+    {
+        comp++;
+        return buscaBinaria(meio + 1, ultimo, array, chave);
+    }
+}
 
 // Função de Inserção com Busca Binária (incompleta)
 // Provavelmente você terá que implementar a Função
