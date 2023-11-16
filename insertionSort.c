@@ -14,22 +14,22 @@ typedef struct log_info
 void insertion_sort(int *, int, log_info *);
 void insertion_sortBB(int *, int, log_info *);
 void shellsort(int *, int, log_info *);
-int busca_binaria(int *, int, int, int, log_info *);
+int buscaBinaria(int primeiro, int ultimo, int *array, int chave, int *comp);
 
 int main(void)
 {
-    log_info logRandom, logCresc, logDecresc;     // armazena contadores de comparações e trocas, além do tempo
+    log_info logRandom, logCresc, logDecresc; // armazena contadores de comparações e trocas, além do tempo
     clock_t t;
-    
+
     srand(time(NULL));
 
-    //faz o processo em array de 100, 1000 e 10000 elementos
-    for(int j = 1; j <= MAX; j = j * 10)
+    // faz o processo em array de 100, 1000 e 10000 elementos
+    for (int j = 1; j <= MAX; j = j * 10)
     {
-        //aloca as arrays
-        int *arrayrandom = (int *)malloc(sizeof(int) * (MAX*j));
-        int *arraycrescente = (int *)malloc(sizeof(int) * (MAX*j));
-        int *arraydecrescente = (int *)malloc(sizeof(int) * (MAX*j));
+        // aloca as arrays
+        int *arrayrandom = (int *)malloc(sizeof(int) * (MAX * j));
+        int *arraycrescente = (int *)malloc(sizeof(int) * (MAX * j));
+        int *arraydecrescente = (int *)malloc(sizeof(int) * (MAX * j));
 
         // Gera os 3 tipos de array
         for (int i = 0; i < MAX * j; i++)
@@ -37,27 +37,27 @@ int main(void)
         for (int i = 0; i < MAX * j; i++)
             arraycrescente[i] = i; // gera números em ordem crescente
         for (int i = 0; i < MAX * j; i++)
-            arraydecrescente[i] = (MAX * j) - i; // gera números em ordem decrescente  
-    
-        //ordena array aleatorio
+            arraydecrescente[i] = (MAX * j) - i; // gera números em ordem decrescente
+
+        // ordena array aleatorio
         t = clock();
-        insertion_sort(arrayrandom, MAX * j, &logRandom);
+        insertion_sortBB(arrayrandom, MAX * j, &logRandom);
         t = clock() - t;
         logRandom.tempo = ((double)t) / CLOCKS_PER_SEC;
 
-        //ordena array em ordem cresc
+        // ordena array em ordem cresc
         t = clock();
-        insertion_sort(arraycrescente, MAX * j, &logCresc);
+        insertion_sortBB(arraycrescente, MAX * j, &logCresc);
         t = clock() - t;
-        logCresc.tempo = ((double)t) / CLOCKS_PER_SEC; 
+        logCresc.tempo = ((double)t) / CLOCKS_PER_SEC;
 
-        //ordena array em ordem decresecente
+        // ordena array em ordem decresecente
         t = clock();
-        insertion_sort(arraydecrescente, MAX * j, &logDecresc);
+        insertion_sortBB(arraydecrescente, MAX * j, &logDecresc);
         t = clock() - t;
-        logDecresc.tempo = ((double)t) / CLOCKS_PER_SEC; 
+        logDecresc.tempo = ((double)t) / CLOCKS_PER_SEC;
 
-        //tabela com os resultados
+        // tabela com os resultados
         printf("\n------------------------------------------------------------------");
         printf("\n%d Elementos:\n\nARRAY\t\t\tTROCAS\t\tCOMPARACOES\tTEMPO\n", MAX * j);
         printf("\nAleatorio");
@@ -76,7 +76,7 @@ int main(void)
         printf("\t\t%fs", logDecresc.tempo);
         printf("\n");
 
-        //libera a memoria alocada
+        // libera a memoria alocada
         free(arrayrandom);
         free(arraycrescente);
         free(arraydecrescente);
@@ -113,41 +113,34 @@ void insertion_sort(int *array, int array_size, log_info *log)
 // *****************************************************
 //  TODO: Implementação dos seus algoritmos (a seguir)
 // *****************************************************
-//funçao pra realizar a bucsa binaria e retornar a posição que deve ser inserida na array(se retornar -1 deve ser inserida na posição 0)
+// funçao pra realizar a bucsa binaria e retornar a posição que deve ser inserida na array(se retornar -1 deve ser inserida na posição 0)
 int buscaBinaria(int primeiro, int ultimo, int *array, int chave, int *comp)
 {
-    //acha o meio da array
-    int meio = (primeiro + ultimo) / 2;
-
-    //se nao tiver nenhum elemento igual a chave na array
-    if (primeiro == ultimo && chave != array[meio])
+    while (primeiro <= ultimo)
     {
-        *comp = *comp + 1;
-        if(chave > array[meio])
-            return meio + 1;
+        int meio = primeiro + (ultimo - primeiro) / 2;
+
+        // se o valor do meio da busca é igual a chave
+        if (array[meio] == chave)
+        {
+            *comp = *comp + 1;
+            return meio;
+        }
+        // procura na metade menor
+        if (array[meio] > chave)
+        {
+            ultimo = meio - 1;
+            *comp = *comp + 1;
+        }
+        // metade maior
         else
-            return meio - 1;
+        {
+            *comp = *comp + 1;
+            primeiro = meio + 1;
+        }
     }
-
-    //se tiver um elemento igual a chave na array
-    if(array[meio] == chave)
-    {
-        *comp = *comp + 1;
-        return meio + 1;
-    }
-
-    //se o elemento do meio for maior que a chave
-    if(array[meio] > chave)
-    {
-        *comp = *comp + 1;
-        return buscaBinaria(primeiro, meio - 1, array, chave, comp);
-    }
-    //se o elemento do meio for menor que a chave
-    else
-    {
-        *comp = *comp + 1;
-        return buscaBinaria(meio + 1, ultimo, array, chave, comp);
-    }
+    // se nao tiver estiver na array
+    return primeiro;
 }
 
 // Função de Inserção com Busca Binária (incompleta)
@@ -158,6 +151,30 @@ void insertion_sortBB(int *array, int array_size, log_info *log)
 {
     log->trocas = 0;
     log->comparacoes = 0;
+    for (int i = 1; i < array_size; i++)
+    {                         // do segundo ao último
+        int chave = array[i]; // chave a inserir no subarray ordenado
+        int j = i - 1;        // último elemento do subarray ordenado
+        int compbb = 0;       // variavel pra calcular as comparaçoes na busca binaria
+        log->comparacoes++;
+        int posicao = buscaBinaria(0, j, array, chave, &compbb); // acha a posição com busca binaria
+        log->comparacoes = log->comparacoes + compbb;            // soma as compracoes da busca binaria
+
+        // move os elementos da array ordenada pra direita
+        while (j >= posicao && array[j] > chave)
+        {
+            log->comparacoes++;
+            array[j + 1] = array[j];
+            j = j - 1;
+            log->trocas++;
+        }
+
+        if (j + 1 != i)
+        {
+            array[j + 1] = chave;
+            log->trocas++;
+        }
+    }
 }
 
 // Função de Shellsort  (incompleta)
