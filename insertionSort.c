@@ -18,7 +18,7 @@ int buscaBinaria(int primeiro, int ultimo, int *array, int chave, int *comp);
 
 int main(void)
 {
-    log_info logRandomIS, logCrescIS, logDecrescIS, logRandomISBB, logCrescISBB, logDecrescISBB; 
+    log_info logRandomIS, logCrescIS, logDecrescIS, logRandomISBB, logCrescISBB, logDecrescISBB, logRandomShell, logCrescShell, logDecrescShell;
     clock_t t;
 
     srand(time(NULL));
@@ -65,9 +65,6 @@ int main(void)
         for (int i = 0; i < MAX * j; i++)
             arraydecrescente[i] = (MAX * j) - i; // gera números em ordem decrescente
 
-
-        //REPETE O PROCESSO COM A BUSCA BINARIA    
-
         // ordena array aleatorio
         t = clock();
         insertion_sortBB(arrayrandom, MAX * j, &logRandomISBB);
@@ -86,6 +83,32 @@ int main(void)
         t = clock() - t;
         logDecrescISBB.tempo = ((double)t) / CLOCKS_PER_SEC;
 
+        // Gera os 3 tipos de array PARA SHELLSORT
+        for (int i = 0; i < MAX * j; i++)
+            arrayrandom[i] = rand() % (MAX * j); // gera números aleatórios para o array
+        for (int i = 0; i < MAX * j; i++)
+            arraycrescente[i] = i; // gera números em ordem crescente
+        for (int i = 0; i < MAX * j; i++)
+            arraydecrescente[i] = (MAX * j) - i; // gera números em ordem decrescente
+
+        // ordena array aleatorio
+        t = clock();
+        shellsort(arrayrandom, MAX * j, &logRandomShell);
+        t = clock() - t;
+        logRandomShell.tempo = ((double)t) / CLOCKS_PER_SEC;
+
+        // ordena array em ordem cresc
+        t = clock();
+        shellsort(arraycrescente, MAX * j, &logCrescShell);
+        t = clock() - t;
+        logCrescShell.tempo = ((double)t) / CLOCKS_PER_SEC;
+
+        // ordena array em ordem decresecente
+        t = clock();
+        shellsort(arraydecrescente, MAX * j, &logDecrescShell);
+        t = clock() - t;
+        logDecrescShell.tempo = ((double)t) / CLOCKS_PER_SEC;
+
         // tabela com os resultados
         printf("\n------------------------------------------------------------------");
         printf("\n%d Elementos:\n", MAX * j);
@@ -97,6 +120,10 @@ int main(void)
         printf("   %d trocas", logRandomISBB.trocas);
         printf("   %d comparacoes", logRandomISBB.comparacoes);
         printf("   %fs", logRandomISBB.tempo);
+        printf("\nAleatorio shellsort:");
+        printf("   %d trocas", logRandomShell.trocas);
+        printf("   %d comparacoes", logRandomShell.comparacoes);
+        printf("   %fs", logRandomShell.tempo);
         printf("\n");
         printf("\nCrescente insertion_sort:");
         printf("   %d trocas", logCrescIS.trocas);
@@ -106,6 +133,10 @@ int main(void)
         printf("   %d trocas", logCrescISBB.trocas);
         printf("   %d comparacoes", logCrescISBB.comparacoes);
         printf("   %fs", logCrescISBB.tempo);
+        printf("\nCrescente shellsort:");
+        printf("   %d trocas", logCrescShell.trocas);
+        printf("   %d comparacoes", logCrescShell.comparacoes);
+        printf("   %fs", logCrescShell.tempo);
         printf("\n");
         printf("\nDecrescente insertion_sort:");
         printf("   %d trocas", logDecrescIS.trocas);
@@ -115,6 +146,10 @@ int main(void)
         printf("   %d trocas", logDecrescISBB.trocas);
         printf("   %d comparacoes", logDecrescISBB.comparacoes);
         printf("   %fs", logDecrescISBB.tempo);
+        printf("\nDecrescente shellsort:");
+        printf("   %d trocas", logDecrescShell.trocas);
+        printf("   %d comparacoes", logDecrescShell.comparacoes);
+        printf("   %fs", logDecrescShell.tempo);
         printf("\n");
 
         // libera a memoria alocada
@@ -193,10 +228,10 @@ void insertion_sortBB(int *array, int array_size, log_info *log)
     log->trocas = 0;
     log->comparacoes = 0;
     for (int i = 1; i < array_size; i++)
-    {                         // do segundo ao último
-        int chave = array[i]; // chave a inserir no subarray ordenado
-        int j = i - 1;        // último elemento do subarray ordenado
-        int compbb = 0;       // variavel pra calcular as comparaçoes na busca binaria
+    {                                                            // do segundo ao último
+        int chave = array[i];                                    // chave a inserir no subarray ordenado
+        int j = i - 1;                                           // último elemento do subarray ordenado
+        int compbb = 0;                                          // variavel pra calcular as comparaçoes na busca binaria
         int posicao = buscaBinaria(0, j, array, chave, &compbb); // acha a posição com busca binaria
         log->comparacoes = log->comparacoes + compbb;            // soma as compracoes da busca binaria
 
@@ -221,4 +256,28 @@ void shellsort(int *array, int array_size, log_info *log)
 {
     log->comparacoes = 0;
     log->trocas = 0;
+    int gap, i, j, chave;
+
+    // define os intervalos
+    for (gap = array_size / 2; gap > 0; gap = gap / 2)
+    {
+        for (i = gap; i < array_size; i += gap) //varredura com o intervalo
+        {
+            chave = array[i];
+            j = i - gap;
+            log->comparacoes++;
+            while (j >= 0 && array[j] > chave) //faz as comparações
+            {
+                log->comparacoes++;
+                array[j + gap] = array[j];
+                j = j - gap;
+                log->trocas++;
+            }
+            if (j + gap != i)
+            {
+                array[j + gap] = chave;
+                log->trocas++;
+            }
+        }
+    }
 }
