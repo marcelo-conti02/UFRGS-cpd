@@ -5,7 +5,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define N_ALGOs 2    // Qtd de algoritmos a serem testados
+#define N_ALGOs 3    // Qtd de algoritmos a serem testados
 #define QTD_ARRAYS 3 // quantidade de arrays a serem processados (1 por tipo)
 #define POTENCIAS 5  // potências de 10 a serem testadas como tamanhos de arrays
 
@@ -40,6 +40,7 @@ int particiona(int *, int, int, struct log_info *);
 void swap(int *, int *);
 int particao_randomizada(int *array, int i, int f, struct log_info *log);
 int random(int i, int f);
+void shakesort(int *array, int array_size, struct log_info *log);
 
 int main(void)
 {
@@ -60,6 +61,10 @@ int main(void)
   strcpy(algoritmos[1].name, "Quicksort");
   strcpy(algoritmos[1].acronym, "QQST");
   algoritmos[1].function = &quicksort;
+
+  strcpy(algoritmos[2].name, "Shakesort");
+  strcpy(algoritmos[2].acronym, "SKST");
+  algoritmos[2].function = &shakesort;
 
   srand(42); // inicializa gerador de números aleatórios
   result = 0;
@@ -240,4 +245,41 @@ int particao_randomizada(int *array, int i, int f, struct log_info *log)
   return particiona(array, i, f, log);
 }
 
+void shakesort(int *array, int array_size, struct log_info *log)
+{
+  int trocas = 0;
+  int comparacoes = 0;
+  int pos_troca = 0;
+  bool troca = true;
+  int qtd_elementos = array_size - 1;
 
+  while (troca)
+  {
+    troca = false;
+    for (int i = 0; i < qtd_elementos; i++)
+    {
+      comparacoes = comparacoes + 1;
+      if (array[i] > array[i + 1])
+      {
+        swap(&array[i], &array[i + 1]);
+        troca = true;
+        pos_troca = i;
+        trocas = trocas + 1;
+      }
+    }
+    for (int i = qtd_elementos; i < 0; i--) //varredura do maior pro menor
+    {
+      comparacoes = comparacoes + 1;
+      if (array[i] < array[i - 1])
+      {
+        swap(&array[i], &array[i - 1]);
+        pos_troca = i;
+        trocas = trocas + 1;
+      }
+    }
+    qtd_elementos = pos_troca;
+  }
+
+  log->trocas = trocas;
+  log->comparacoes = comparacoes;
+}
