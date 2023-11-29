@@ -5,7 +5,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define N_ALGOs 3    // Qtd de algoritmos a serem testados
+#define N_ALGOs 4    // Qtd de algoritmos a serem testados
 #define QTD_ARRAYS 3 // quantidade de arrays a serem processados (1 por tipo)
 #define POTENCIAS 5  // potências de 10 a serem testadas como tamanhos de arrays
 
@@ -41,6 +41,7 @@ void swap(int *, int *);
 int particao_randomizada(int *array, int i, int f, struct log_info *log);
 int random(int i, int f);
 void shakesort(int *array, int array_size, struct log_info *log);
+void combsort(int *array, int array_size, struct log_info *log);
 
 int main(void)
 {
@@ -65,6 +66,10 @@ int main(void)
   strcpy(algoritmos[2].name, "Shakesort");
   strcpy(algoritmos[2].acronym, "SKST");
   algoritmos[2].function = &shakesort;
+
+  strcpy(algoritmos[3].name, "Combsort");
+  strcpy(algoritmos[3].acronym, "CBST");
+  algoritmos[3].function = &combsort;
 
   srand(42); // inicializa gerador de números aleatórios
   result = 0;
@@ -288,3 +293,35 @@ void shakesort(int *array, int array_size, struct log_info *log)
   log->trocas = trocas;
   log->comparacoes = comparacoes;
 }
+
+void combsort(int *array, int array_size, struct log_info *log)
+{
+  int trocas = 0;
+  int comparacoes = 0;
+  bool troca = true;
+  int gap = array_size;
+
+  while (troca || gap > 1)
+  {
+    gap = (gap * 10) / 13;
+
+    if(gap < 1)
+      gap = 1;
+
+    troca = false;
+    for (int i = 0; i < array_size - gap; i++)
+    {
+      comparacoes = comparacoes + 1;
+      if (array[i] > array[i + gap])
+      {
+        swap(&array[i], &array[i + gap]);
+        troca = true;
+        trocas = trocas + 1;
+      }
+    }
+  }
+  log->trocas = trocas;
+  log->comparacoes = comparacoes;
+}
+
+
