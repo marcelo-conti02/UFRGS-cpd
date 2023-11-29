@@ -249,35 +249,40 @@ void shakesort(int *array, int array_size, struct log_info *log)
 {
   int trocas = 0;
   int comparacoes = 0;
-  int pos_troca = 0;
+  int bottom = 0;
   bool troca = true;
-  int qtd_elementos = array_size - 1;
+  int top = array_size - 1;
 
   while (troca)
   {
     troca = false;
-    for (int i = 0; i < qtd_elementos; i++)
+    for (int i = bottom; i < top; i++)
     {
       comparacoes = comparacoes + 1;
       if (array[i] > array[i + 1])
       {
         swap(&array[i], &array[i + 1]);
         troca = true;
-        pos_troca = i;
         trocas = trocas + 1;
       }
     }
-    for (int i = qtd_elementos; i < 0; i--) //varredura do maior pro menor
+    top -= 1;
+
+    if(troca)
     {
-      comparacoes = comparacoes + 1;
-      if (array[i] < array[i - 1])
+      troca = false;
+      for (int i = top; i > bottom; i--) //varredura do maior pro menor
       {
-        swap(&array[i], &array[i - 1]);
-        pos_troca = i;
-        trocas = trocas + 1;
+        comparacoes = comparacoes + 1;
+        if (array[i] < array[i - 1])
+        {
+          swap(&array[i], &array[i - 1]);
+          trocas = trocas + 1;
+          troca = true;
+        }
       }
     }
-    qtd_elementos = pos_troca;
+    bottom += 1;
   }
 
   log->trocas = trocas;
