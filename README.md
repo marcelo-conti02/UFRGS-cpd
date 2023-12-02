@@ -4,3 +4,5 @@ Algoritmos implementados dos laboratórios de Classificação e Pesquisa de Dado
     Algoritmos de Classificação por inserção;
 
     Algoritmos de Classificação por troca;
+
+    Algoritmos de Classificação por seleção;
