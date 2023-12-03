@@ -18,6 +18,8 @@ int pai(const int*, int);
 int heap_max(int* heap);
 int extract_max(int* heap, int elemento, int* heap_size, struct log_info* loginfo);
 void insert_heap(int* heap, int *heap_size, int chave);
+void buildheapMax(int* array, int array_size, struct log_info* loginfo);
+void heapsortMax(int* array, int heap_size, struct log_info* loginfo);
 
 int main(void){
   struct log_info log;                                                          // armazena contadores de comparações e trocas
@@ -36,7 +38,7 @@ int main(void){
   // buildheap
 
   t = clock();
-  buildheap(array1, SIZE, &log);
+  buildheap(array2, SIZE, &log);
   t = clock() - t;
 
   printf("Array transformado em Heap: ");
@@ -73,7 +75,7 @@ int main(void){
   printf("\n");
 
   t = clock();
-  heapsort(array2, SIZE, &log);
+  heapsortMax(array2, SIZE, &log);
   t = clock() - t;
 
   printf("Array após heapsort: ");
@@ -136,11 +138,46 @@ void heapsort(int* array, int heap_size, struct log_info* loginfo){
    }
 }
 
+// Heapsort
+void heapsortMax(int* array, int heap_size, struct log_info* loginfo){
+   int tmp;
+   int qtd_elementos = heap_size-1;
+
+   loginfo->trocas = 0;
+   loginfo->comparacoes = 0;
+
+   buildheapMax(array, heap_size, loginfo);
+
+   for(int i = qtd_elementos; i>0; i--){
+      loginfo->trocas++;
+      tmp = array[i];
+      array[i] = array[0];
+      array[0] = tmp;
+      heap_size--;
+      heapify(array, 0, heap_size, loginfo);
+   }
+}
+
 // usada no heapsort
 void buildheap(int* array, int array_size, struct log_info* loginfo){
    int ultimo_pai = (array_size/2)-1;
    for(int i=ultimo_pai; i>=0; i--)
       heapify(array, i, array_size, loginfo);
+}
+
+// usada no heapsort
+void buildheapMax(int* array, int array_size, struct log_info* loginfo){
+   int ultimo_pai = (array_size/2)-1;
+   int flag;
+   for(int i=0; i<=ultimo_pai; i++)
+   {
+      int j = i;
+      while(j>=0)
+      {
+         heapify(array, j, array_size, loginfo);
+         j--;
+      }
+   }
 }
 
 // heapify: verifica se o elemento na posição passada é um heap e se o não for, transforma-o em um heap
@@ -149,7 +186,6 @@ void buildheap(int* array, int array_size, struct log_info* loginfo){
 void heapify(int* array, int elemento, int heap_size, struct log_info* loginfo){
     int maior = elemento;
     int tmp;
-
     int esquerdo = filho_e(array, elemento);
     int direito = filho_d(array, elemento);
 
